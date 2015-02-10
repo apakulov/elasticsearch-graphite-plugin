@@ -37,15 +37,13 @@ Check your elasticsearch log file for a line like this after adding the configur
 
 ## Bugs/TODO
 
-* No really nice cluster support yet (needed it for a single instance system)
 * Not extensively tested
 * In case of a master node failover, counts are starting from 0 again (in case you are wondering about spikes)
 
 
 ## Credits
 
-Heavily inspired by the excellent [metrics library](http://metrics.codahale.com) by Coda Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
-
+Original plugin has been written by [Alexander Reelsen](https://github.com/spinscale), which was heavily inspired by the excellent [metrics library](http://metrics.codahale.com) by Coda Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
 
 ## License
 
