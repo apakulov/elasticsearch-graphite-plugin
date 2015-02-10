@@ -2,7 +2,7 @@ package org.elasticsearch.module.graphite.test;
 
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.collect.Iterables;
-import org.elasticsearch.common.inject.ProvisionException;
+import org.elasticsearch.common.inject.CreationException;
 import org.elasticsearch.node.Node;
 import org.junit.After;
 import org.junit.Before;
@@ -85,12 +85,11 @@ public class GraphitePluginIntegrationTest {
         assertGraphiteMetricIsContained("elasticsearch." + clusterName + ".node.jvm.threads.peakCount ");
     }
 
-    @Test(expected = ProvisionException.class)
+    @Test(expected = CreationException.class)
     public void testThatBrokenRegexLeadsToException() throws Exception {
         String excludeRegex = "*.peakCount";
         createNode(clusterName, GRAPHITE_SERVER_PORT, "1s", null, excludeRegex);
     }
-
 
     @Test
     public void masterFailOverShouldWork() throws Exception {

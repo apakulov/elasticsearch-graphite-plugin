@@ -20,6 +20,7 @@ public class NodeTestHelper {
 
         settingsBuilder.put("path.conf", NodeTestHelper.class.getResource("/").getFile());
 
+        settingsBuilder.put("node.name", "node");
         settingsBuilder.put("gateway.type", "none");
         settingsBuilder.put("cluster.name", clusterName);
         settingsBuilder.put("index.number_of_shards", 1);
