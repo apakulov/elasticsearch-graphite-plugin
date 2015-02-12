@@ -1,25 +1,20 @@
-# Elasticsearch graphite plugin
+Elasticsearch Graphite Plugin
+=============================
 
-This plugin creates a little push service, which regularly updates a graphite host with indices stats and nodes stats. In case you are running a cluster, these datas are always only pushed from the master node.
+This plugin creates a little push service, which regularly updates a graphite host with indices stats and nodes stats. Only primary master node reports about individual indices.
 
-The data sent to the graphite server tries to be roughly equivalent to [Indices Stats API](http://www.elasticsearch.org/guide/reference/api/admin-indices-stats.html) and [Nodes Stats Api](http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats.html)
+The data sent to the graphite server tries to be roughly equivalent to [Indices Stats API](http://www.elasticsearch.org/guide/reference/api/admin-indices-stats.html) and [Nodes Stats Api](http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats.html).
 
 
-## Installation
-
-As plugins (except site plugins) cannot be automatically installed from github currently you need to build the plugin yourself (takes half a minute including an integrations test).
-
+Install
+-------
 ```
-git clone https://github.com/spinscale/elasticsearch-graphite-plugin
-cd elasticsearch-graphite-plugin
-mvn package
-/path/to/elasticsearch/bin/plugin -install graphite -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-plugin-graphite-0.2-SNAPSHOT.zip
+elasticsearch/bin/plugin -install graphite -url elasticsearch-plugin-graphite-0.3.zip
 ```
 
-
-## Configuration
-
-Configuration is possible via three parameters:
+Usage
+-----
+Plugin has a set of possible parameters:
 
 * `metrics.graphite.host`: The graphite host to connect to (default: none)
 * `metrics.graphite.port`: The port to connect to (default: 2003)
@@ -34,18 +29,28 @@ Check your elasticsearch log file for a line like this after adding the configur
 [2013-02-08 16:01:49,153][INFO ][service.graphite         ] [Sea Urchin] Graphite reporting triggered every [1m] to host [graphite.example.com:2003]
 ```
 
-
-## Bugs/TODO
-
-* Not extensively tested
+TODO-List
+---------
 * In case of a master node failover, counts are starting from 0 again (in case you are wondering about spikes)
 
 
-## Credits
-
+Credits
+-------
 Original plugin has been written by [Alexander Reelsen](https://github.com/spinscale), which was heavily inspired by the excellent [metrics library](http://metrics.codahale.com) by Coda Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
 
-## License
+License
+-------
+    Copyright 2015 Alexander Pakulov
 
-See LICENSE
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 

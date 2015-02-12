@@ -63,13 +63,12 @@ public class GraphiteService extends AbstractLifecycleComponent<GraphiteService>
     public class GraphiteReporterThread implements Runnable {
         public void run() {
             DiscoveryNode node = clusterService.localNode();
-            boolean isClusterStarted = clusterService.lifecycleState().equals(Lifecycle.State.STARTED);
 
-            if (isClusterStarted && node != null) {
+            if (isClusterReady() && node != null) {
                 String primaryMasterNode = clusterService.state().nodes().masterNodeId();
-                NodeIndicesStats nodeIndicesStats = indicesService.stats(false);
-                NodeStats nodeStats = nodeService.stats(new CommonStatsFlags().clear(), true, true, true, true, true, true, true, true, true);
-                List<IndexShard> indexShards = getIndexShards(indicesService);
+                final NodeIndicesStats nodeIndicesStats = indicesService.stats(false);
+                final NodeStats nodeStats = nodeService.stats(new CommonStatsFlags().clear(), true, true, true, true, true, true, true, true, true);
+                final List<IndexShard> indexShards = getIndexShards(indicesService);
 
                 try (GraphiteSocket graphiteSocket = new GraphiteSocket(graphiteSettings)) {
                     GraphiteReporter graphiteReporter = new GraphiteReporter(graphiteSocket, node.name(), node.id().equalsIgnoreCase(primaryMasterNode), nodeIndicesStats, indexShards, nodeStats);
@@ -80,6 +79,10 @@ public class GraphiteService extends AbstractLifecycleComponent<GraphiteService>
             } else if (node != null) {
                 logger.debug("Cluster hasn't started - not triggering update");
             }
+        }
+
+        private boolean isClusterReady() {
+            return Lifecycle.State.STARTED.equals(clusterService.lifecycleState());
         }
 
         private List<IndexShard> getIndexShards(IndicesService indicesService) {

@@ -57,9 +57,9 @@ public class GraphiteSocket implements AutoCloseable {
     private String extractValue(Object object) {
         String value;
         if (object instanceof Double) {
-            value = String.format("%2.2f", object);
-        } else if (object instanceof  Integer) {
-            value = String.format("%d", object);
+            value = String.format("%2.2f", (Double) object);
+        } else if (object instanceof Integer) {
+            value = String.format("%d", (Integer) object);
         } else {
             value = object.toString();
         }
