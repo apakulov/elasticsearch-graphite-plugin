@@ -1,4 +1,4 @@
-Elasticsearch Graphite Plugin
+Elasticsearch Graphite Plugin [![Build Status][travis-image]][travis-url]
 =============================
 
 This plugin creates a little push service, which regularly updates a graphite host with indices stats and nodes stats. Only primary master node reports about individual indices.
@@ -54,3 +54,5 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
+[travis-url]: https://travis-ci.org/apakulov/elasticsearch-graphite-plugin
+[travis-image]: https://travis-ci.org/apakulov/elasticsearch-graphite-plugin.svg?branch=master
