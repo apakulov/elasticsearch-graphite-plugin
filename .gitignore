@@ -8,3 +8,5 @@ target
 *.swp
 *.iml
 .idea
+settings.xml
+atlassian-ide-plugin.xml
