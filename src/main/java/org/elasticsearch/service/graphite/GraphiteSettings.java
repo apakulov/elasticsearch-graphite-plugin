@@ -2,7 +2,6 @@ package org.elasticsearch.service.graphite;
 
 import org.elasticsearch.common.base.MoreObjects;
 import org.elasticsearch.common.base.Strings;
-import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 
@@ -101,7 +100,8 @@ public class GraphiteSettings {
                 .add("port", port)
                 .add("prefix", prefix)
                 .add("refreshInterval", refreshInterval)
-                .add("regex", ImmutableMap.of("inclusion", inclusionRegex, "exclusion", exclusionRegex))
+                .add("regex.inclusion", inclusionRegex)
+                .add("regex.exclusion", inclusionRegex)
                 .toString();
     }
 }

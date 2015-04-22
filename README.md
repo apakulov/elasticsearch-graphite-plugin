@@ -9,7 +9,7 @@ The data sent to the graphite server tries to be roughly equivalent to [Indices 
 Install
 -------
 ```
-elasticsearch/bin/plugin --install com.pakulov.elasticsearch/elasticsearch-plugin-graphite/0.4.0
+bin/plugin --install graphite --url com.pakulov.elasticsearch/elasticsearch-plugin-graphite/0.4.0
 ```
 
 Usage

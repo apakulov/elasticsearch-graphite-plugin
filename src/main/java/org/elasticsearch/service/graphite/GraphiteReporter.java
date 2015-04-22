@@ -14,7 +14,7 @@ import org.elasticsearch.index.merge.MergeStats;
 import org.elasticsearch.index.refresh.RefreshStats;
 import org.elasticsearch.index.search.stats.SearchStats;
 import org.elasticsearch.index.shard.DocsStats;
-import org.elasticsearch.index.shard.service.IndexShard;
+import org.elasticsearch.index.shard.IndexShard;
 import org.elasticsearch.index.store.StoreStats;
 import org.elasticsearch.index.warmer.WarmerStats;
 import org.elasticsearch.indices.NodeIndicesStats;
@@ -31,11 +31,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class GraphiteReporter {
+public class GraphiteReporter implements Runnable {
 
     private static final ESLogger logger = ESLoggerFactory.getLogger(GraphiteReporter.class.getName());
 
-    private boolean isPrimary;
     private List<IndexShard> indexShards;
     private NodeStats nodeStats;
     private final long timestamp;
@@ -43,17 +42,17 @@ public class GraphiteReporter {
     private final String nodeName;
     private final GraphiteSocket graphiteSocket;
 
-    public GraphiteReporter(GraphiteSocket graphiteSocket, String nodeName, boolean isPrimary, NodeIndicesStats nodeIndicesStats,
+    public GraphiteReporter(GraphiteSocket graphiteSocket, String nodeName, NodeIndicesStats nodeIndicesStats,
                             List<IndexShard> indexShards, NodeStats nodeStats) {
         this.graphiteSocket = graphiteSocket;
         this.nodeName = nodeName;
-        this.isPrimary = isPrimary;
         this.indexShards = indexShards;
         this.nodeStats = nodeStats;
         this.timestamp = System.currentTimeMillis() / 1000;
         this.nodeIndicesStats = nodeIndicesStats;
     }
 
+    @Override
     public void run() {
         try {
             sendNodeIndicesStats();
@@ -230,9 +229,6 @@ public class GraphiteReporter {
     }
 
     private void sendIndexShardStats() throws IOException {
-        if (!isPrimary) {
-            return;
-        }
         for (IndexShard indexShard : indexShards) {
             String type = "indexes." + indexShard.shardId().index().name() + ".id." + indexShard.shardId().id();
             sendIndexShardStats(type, indexShard);

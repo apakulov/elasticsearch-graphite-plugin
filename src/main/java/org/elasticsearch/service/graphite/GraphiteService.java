@@ -5,13 +5,14 @@ import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.action.admin.indices.stats.CommonStatsFlags;
 import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.cluster.node.DiscoveryNode;
+import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.component.AbstractLifecycleComponent;
 import org.elasticsearch.common.component.Lifecycle;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.service.IndexService;
-import org.elasticsearch.index.shard.service.IndexShard;
+import org.elasticsearch.index.IndexService;
+import org.elasticsearch.index.shard.IndexShard;
 import org.elasticsearch.indices.IndicesService;
 import org.elasticsearch.indices.NodeIndicesStats;
 import org.elasticsearch.node.service.NodeService;
@@ -61,18 +62,18 @@ public class GraphiteService extends AbstractLifecycleComponent<GraphiteService>
     protected void doClose() throws ElasticsearchException {}
 
     public class GraphiteReporterThread implements Runnable {
+        @Override
         public void run() {
             DiscoveryNode node = clusterService.localNode();
 
             if (isClusterReady() && node != null) {
-                String primaryMasterNode = clusterService.state().nodes().masterNodeId();
                 final NodeIndicesStats nodeIndicesStats = indicesService.stats(false);
                 final NodeStats nodeStats = nodeService.stats(new CommonStatsFlags().clear(), true, true, true, true, true, true, true, true, true);
                 final List<IndexShard> indexShards = getIndexShards(indicesService);
 
                 try (GraphiteSocket graphiteSocket = new GraphiteSocket(graphiteSettings)) {
-                    GraphiteReporter graphiteReporter = new GraphiteReporter(graphiteSocket, node.name(), node.id().equalsIgnoreCase(primaryMasterNode), nodeIndicesStats, indexShards, nodeStats);
-                    graphiteReporter.run();
+                    GraphiteReporter graphiteReporter = new GraphiteReporter(graphiteSocket, node.name(), nodeIndicesStats, indexShards, nodeStats);
+                    Executors.newSingleThreadExecutor().submit(graphiteReporter).get();
                 } catch (Exception e) {
                     logger.error("Something bad happened during graphite data processing", e);
                 }
@@ -87,10 +88,12 @@ public class GraphiteService extends AbstractLifecycleComponent<GraphiteService>
 
         private List<IndexShard> getIndexShards(IndicesService indicesService) {
             List<IndexShard> indexShards = Lists.newArrayList();
-            for (String indexName : indicesService.indices().keySet()) {
-                IndexService indexService = indicesService.indexServiceSafe(indexName);
-                for (int shardId : indexService.shardIds()) {
-                    indexShards.add(indexService.shard(shardId));
+            for (IndexService indexService : indicesService) {
+                for (IndexShard indexShard : indexService) {
+                    ShardRouting routingEntry = indexShard.routingEntry();
+                    if (null != routingEntry && routingEntry.active() && routingEntry.primary()) {
+                        indexShards.add(indexShard);
+                    }
                 }
             }
             return indexShards;
